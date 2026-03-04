@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>확장 전략 검토용 구조 분석본</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+  :root {
+    --primary: #0f172a;
+    --primary-mid: #1e3a5f;
+    --primary-light: #3b82f6;
+    --accent: #ef4444;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #0f172a;
+    --text-sub: #64748b;
+    --border: #e2e8f0;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --purple: #8b5cf6;
+    --radius: 16px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f766e 100%);
+    color: white;
+    padding: 40px 20px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: -30px;
+    width: 180px; height: 180px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 50%;
+  }
+  .header .conf-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    letter-spacing: 0.8px;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    position: relative;
+  }
+  .header .subtitle {
+    font-size: 12px;
+    opacity: 0.6;
+    font-weight: 400;
+    position: relative;
+  }
+
+  /* ===== CONTAINER ===== */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 16px 48px;
+  }
+
+  /* ===== SECTION ===== */
+  .sec { margin-bottom: 32px; }
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary);
+  }
+  .sec-num {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    min-width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .sec-head h2 {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .card-h {
+    padding: 14px 18px;
+    font-weight: 700;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--primary-mid);
+  }
+  .card-b { padding: 18px; }
+
+  /* ===== ANALYSIS BARS ===== */
+  .a-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .a-item:last-child { border-bottom: none; }
+  .a-lbl {
+    width: 76px;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+    color: var(--text-sub);
+  }
+  .a-track {
+    flex: 1;
+    height: 22px;
+    background: #f1f5f9;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .a-fill {
+    height: 100%;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    color: white;
+  }
+  .a-grade {
+    width: 32px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+
+  /* ===== METRIC ROWS ===== */
+  .m-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .m-row:last-child { border-bottom: none; }
+  .m-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .m-info { flex: 1; min-width: 0; }
+  .m-label { font-size: 11px; color: var(--text-sub); }
+  .m-value { font-size: 14px; font-weight: 700; }
+  .m-target { text-align: right; font-size: 11px; flex-shrink: 0; }
+  .m-target .cur { color: var(--text-sub); }
+  .m-target .tgt { color: var(--accent); font-weight: 700; }
+  .m-note {
+    margin-top: 14px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 10px;
+    font-size: 12px;
+    color: var(--text-sub);
+    line-height: 1.5;
+  }
+
+  /* ===== SCORE CARDS (mobile-friendly replacement for table) ===== */
+  .score-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+    overflow: hidden;
+    border-left: 4px solid;
+  }
+  .score-top {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .score-name { font-weight: 700; font-size: 14px; }
+  .score-badge {
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 800;
+  }
+  .score-body {
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .score-item {
+    text-align: center;
+    padding: 6px 0;
+  }
+  .score-item .s-label {
+    font-size: 10px;
+    color: var(--text-sub);
+    margin-bottom: 2px;
+  }
+  .score-item .s-stars {
+    font-size: 11px;
+    letter-spacing: -1px;
+  }
+  .score-bottom {
+    padding: 10px 16px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+  .score-total { font-weight: 900; font-size: 18px; }
+
+  /* ===== ROADMAP ===== */
+  .roadmap {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    padding-left: 24px;
+  }
+  .roadmap::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #ef4444, #f59e0b, #3b82f6, #10b981);
+    border-radius: 3px;
+  }
+  .rm-step {
+    position: relative;
+    padding: 0 0 24px;
+  }
+  .rm-step::before {
+    content: '';
+    position: absolute;
+    left: -19px;
+    top: 6px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px currentColor;
+  }
+  .rm-step .rm-phase {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .rm-step h5 {
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .rm-step p {
+    font-size: 12px;
+    color: var(--text-sub);
+    line-height: 1.5;
+  }
+  .rm-step .rm-time {
+    font-size: 10px;
+    color: var(--text-sub);
+    margin-top: 4px;
+    padding: 2px 8px;
+    background: #f1f5f9;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  /* ===== STRATEGY CARDS ===== */
+  .str-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+    border-left: 4px solid;
+    overflow: hidden;
+  }
+  .str-head {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .str-head .str-phase {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 6px;
+  }
+  .str-head h4 { font-size: 14px; font-weight: 800; }
+  .str-head .str-desc { font-size: 12px; color: var(--text-sub); margin-top: 4px; }
+  .str-body { padding: 14px 18px; }
+  .str-body ul { list-style: none; font-size: 12px; }
+  .str-body ul li {
+    padding: 5px 0 5px 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .str-body ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+    opacity: 0.5;
+  }
+
+  /* ===== RISK ITEMS ===== */
+  .risk-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .risk-item:last-child { border-bottom: none; }
+  .risk-badge {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .risk-high { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+  .risk-mid { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+  .risk-low { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+  .risk-info h5 { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .risk-info p { font-size: 11px; color: var(--text-sub); line-height: 1.5; }
+
+  /* ===== ACTION ITEMS ===== */
+  .act-item {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .act-num {
+    min-width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 900;
+    color: white;
+    flex-shrink: 0;
+  }
+  .act-info { flex: 1; min-width: 0; }
+  .act-info h5 { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .act-info p { font-size: 11px; color: var(--text-sub); line-height: 1.5; }
+  .act-tag {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  /* ===== KPI CARDS ===== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 18px 14px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    border-top: 3px solid;
+  }
+  .kpi-label { font-size: 10px; color: var(--text-sub); font-weight: 600; margin-bottom: 6px; }
+  .kpi-current { font-size: 22px; font-weight: 900; }
+  .kpi-arrow { font-size: 16px; margin: 2px 0; }
+  .kpi-target-val { font-size: 16px; font-weight: 800; }
+  .kpi-period { font-size: 10px; color: var(--text-sub); margin-top: 4px; }
+  .kpi-bar { height: 6px; background: #f1f5f9; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+  .kpi-bar-fill { height: 100%; border-radius: 3px; }
+
+  /* ===== NEW AREA CARDS ===== */
+  .area-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+    overflow: hidden;
+    border-top: 3px solid;
+  }
+  .area-card .area-head {
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+  .area-card .area-desc {
+    padding: 12px 18px;
+    font-size: 12px;
+    color: var(--text-sub);
+    border-bottom: 1px solid var(--border);
+    line-height: 1.5;
+  }
+  .area-card .area-specs {
+    padding: 12px 18px;
+  }
+  .area-spec-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #f8fafc;
+    font-size: 12px;
+  }
+  .area-spec-row:last-child { border-bottom: none; }
+
+  /* ===== FINAL SUMMARY ===== */
+  .final-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .final-card {
+    text-align: center;
+    padding: 20px 18px;
+    border-radius: var(--radius);
+  }
+  .final-card .fc-label {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .final-card .fc-title {
+    font-size: 22px;
+    font-weight: 900;
+    margin-bottom: 12px;
+  }
+  .final-card .fc-list {
+    font-size: 12px;
+    text-align: left;
+    line-height: 1.8;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 24px 16px;
+    color: var(--text-sub);
+    font-size: 11px;
+  }
+
+  /* ===== DESKTOP ===== */
+  @media (min-width: 640px) {
+    .header { padding: 48px 32px 40px; }
+    .header h1 { font-size: 28px; }
+    .container { padding: 28px 24px 60px; }
+    .sec-head h2 { font-size: 20px; }
+    .a-lbl { width: 100px; font-size: 12px; }
+    .score-body { grid-template-columns: repeat(6, 1fr); }
+    .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+    .final-grid { grid-template-columns: repeat(3, 1fr); }
+    .act-grid-desk { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .act-grid-desk .act-item { margin-bottom: 0; }
+  }
+
+  @media (min-width: 960px) {
+    .header h1 { font-size: 32px; }
+    .str-grid-desk { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .str-grid-desk .str-card { margin-bottom: 0; }
+    .area-grid-desk { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .area-grid-desk .area-card { margin-bottom: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="conf-badge">CONFIDENTIAL | 2026. 03. 04</div>
+  <h1>확장 전략 검토용 구조 분석본</h1>
+  <p class="subtitle">사업 확장 방향성 및 실행 전략 도출을 위한 구조적 분석</p>
+</div>
+
+<div class="container">
+
+  <!-- 1. 사업 구조 진단 -->
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-num">1</span>
+      <h2>현재 사업 구조 진단</h2>
+    </div>
+
+    <div class="card">
+      <div class="card-h">사업 역량 진단</div>
+      <div class="card-b">
+        <div class="a-item"><span class="a-lbl">고객 다각화</span><div class="a-track"><div class="a-fill" style="width:70%;background:linear-gradient(90deg,#3b82f6,#93c5fd);">70</div></div><span class="a-grade" style="color:#3b82f6;">B+</span></div>
+        <div class="a-item"><span class="a-lbl">차종 커버리지</span><div class="a-track"><div class="a-fill" style="width:90%;background:linear-gradient(90deg,#059669,#6ee7b7);">90</div></div><span class="a-grade" style="color:#059669;">A</span></div>
+        <div class="a-item"><span class="a-lbl">지역 커버리지</span><div class="a-track"><div class="a-fill" style="width:75%;background:linear-gradient(90deg,#3b82f6,#93c5fd);">75</div></div><span class="a-grade" style="color:#3b82f6;">B+</span></div>
+        <div class="a-item"><span class="a-lbl">매출 안정성</span><div class="a-track"><div class="a-fill" style="width:45%;background:linear-gradient(90deg,#ef4444,#fca5a5);">45</div></div><span class="a-grade" style="color:#ef4444;">C</span></div>
+        <div class="a-item"><span class="a-lbl">단가 관리</span><div class="a-track"><div class="a-fill" style="width:40%;background:linear-gradient(90deg,#ef4444,#fca5a5);">40</div></div><span class="a-grade" style="color:#ef4444;">C</span></div>
+        <div class="a-item"><span class="a-lbl">운영 효율</span><div class="a-track"><div class="a-fill" style="width:55%;background:linear-gradient(90deg,#f59e0b,#fcd34d);">55</div></div><span class="a-grade" style="color:#f59e0b;">C+</span></div>
+        <div class="a-item"><span class="a-lbl">전문성 차별화</span><div class="a-track"><div class="a-fill" style="width:60%;background:linear-gradient(90deg,#f59e0b,#fcd34d);">60</div></div><span class="a-grade" style="color:#f59e0b;">B-</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">거래처 의존도 & 수익 구조</div>
+      <div class="card-b">
+        <div class="m-row">
+          <div class="m-icon" style="background:#eff6ff;color:#2563eb;">1</div>
+          <div class="m-info"><div class="m-label">건설/지반공사</div><div class="m-value">매출 비중 ~40%</div></div>
+          <div class="m-target"><div class="cur">높은 의존</div><div class="tgt">목표: 30%↓</div></div>
+        </div>
+        <div class="m-row">
+          <div class="m-icon" style="background:#ecfdf5;color:#059669;">2</div>
+          <div class="m-info"><div class="m-label">철 가공 납품</div><div class="m-value">매출 비중 ~30%</div></div>
+          <div class="m-target"><div class="cur">안정 기반</div><div class="tgt">유지/강화</div></div>
+        </div>
+        <div class="m-row">
+          <div class="m-icon" style="background:#fffbeb;color:#d97706;">3</div>
+          <div class="m-info"><div class="m-label">가스공사</div><div class="m-value">매출 비중 ~15%</div></div>
+          <div class="m-target"><div class="cur">성장 잠재</div><div class="tgt">목표: 20%+</div></div>
+        </div>
+        <div class="m-row">
+          <div class="m-icon" style="background:#fef2f2;color:#dc2626;">4</div>
+          <div class="m-info"><div class="m-label">환경분석계 (포스코)</div><div class="m-value">매출 비중 ~6%</div></div>
+          <div class="m-target"><div class="cur">성장 초기</div><div class="tgt">목표: 10%+</div></div>
+        </div>
+        <div class="m-row">
+          <div class="m-icon" style="background:#f5f3ff;color:#7c3aed;">5</div>
+          <div class="m-info"><div class="m-label">기타 (한약/학교/요트)</div><div class="m-value">매출 비중 ~9%</div></div>
+          <div class="m-target"><div class="cur">부가 수익</div><div class="tgt">선별 관리</div></div>
+        </div>
+        <div class="m-note"><strong style="color:var(--accent);">핵심 이슈:</strong> 상위 2개 거래처가 매출의 ~70%를 차지, 프로젝트형 비중(~55%)이 높아 변동성이 큰 구조</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 확장 가능성 평가 -->
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-num">2</span>
+      <h2>확장 가능성 평가 매트릭스</h2>
+    </div>
+
+    <div class="score-card" style="border-color:#ef4444;">
+      <div class="score-top"><span class="score-name">철 가공 납품</span><span class="score-badge" style="background:#fef2f2;color:#dc2626;">1순위 확대</span></div>
+      <div class="score-body">
+        <div class="score-item"><div class="s-label">시장규모</div><div class="s-stars" style="color:#f59e0b;">★★★★☆</div></div>
+        <div class="score-item"><div class="s-label">진입장벽</div><div class="s-stars" style="color:#10b981;">★★☆☆☆</div></div>
+        <div class="score-item"><div class="s-label">수익성</div><div class="s-stars" style="color:#ef4444;">★★★★☆</div></div>
+        <div class="score-item"><div class="s-label">안정성</div><div class="s-stars" style="color:#ef4444;">★★★★★</div></div>
+        <div class="score-item"><div class="s-label">시너지</div><div class="s-stars" style="color:#ef4444;">★★★★☆</div></div>
+        <div class="score-item"><div class="s-label">경쟁강도</div><div class="s-stars" style="color:#f59e0b;">★★★☆☆</div></div>
+      </div>
+      <div class="score-bottom"><span>종합</span><span class="score-total" style="color:#10b981;">4.2</span></div>
+    </div>
+
+    <div class="score-card" style="border-color:#ef4444;">
+      <div class="score-top"><span class="score-name">환경분석계 (포스코)</span><span class="score-badge" style="background:#fef2f2;color:#dc2626;">전략 육성</span></div>
+      <div class="score-body">
+        <div class="score-item"><div class="s-label">시장규모</div><div class="s-stars" style="color:#f59e0b;">★★★☆☆</div></div>
+        <div class="score-item"><div class="s-label">진입장벽</div><div class="s-stars" style="color:#ef4444;">★★★★☆</div></div>
+        <div class="score-item"><div class="s-label">수익성</div><div class="s-stars" style="color:#ef4444;">★★★★★</div></div>
+        <div class="score-item"><div class="s-label">안정성</div><div class="s-stars" style="color:#f59e0b;">★★★★☆</div></div>
+        <div class="score-item"><div class="s-label">시너지</div><div class="s-stars" style="color:#f59e0b;">★★★☆☆</div></div>
+        <div class="score-item"><div class="s-label">경쟁강도</div><div class="s-stars" style="color:#10b981;">★★☆☆☆</div></div>
+      </div>
+      <div class="score-bottom"><span>종합</span><span class="score-total" style="color:#10b981;">3.8</span></div>
+    </div>
+
+    <div class="score-card" style="border-color:#f59e0b;">
+      <div class="score-top"><span class="score-name">건설/지반공사</span><span class="score-badge" style="background:#fffbeb;color:#d97706;">유지/심화</span></div>
+      <div class="score-body">
+        <div class="score-item"><div class="s-label">시장규모</div><div class="s-stars" style="color:#ef4444;">★★★★★</div></div>
+        <div class="score-item"><div class="s-label">진입장벽</div><div class="s-stars" style="color:#f59e0b;">★★★☆☆</div></div>
+        <div class="score-item"><div class="s-label">수익성</div><div class="s-stars" style="color:#f59e0b;">★★★☆☆</div></div>
+        <div class="score-item"><div class="s-label">안정성</div><div class="s-stars" style="color:#10b981;">★★☆☆☆</div></div>
+        <div class="score-item"><div class="s-label">시너지</div><div class="s-stars" style="color:#ef4444;">★★★★★</div></div>
+        <div class="score-item"><div class="s-label">경쟁강도</div><div class="s-stars" style="color:#ef4444;">★★★★☆</div></div>
+      </div>
+      <div class="score-bottom"><span>종합</span><span class="score-total" style="color:var(--primary-mid);">3.7</span></div>
+    </div>
+
+    <div class="score-card" style="border-color:#3b82f6;">
+      <div class="score-top"><span class="score-name">가스공사</span><span class="score-badge" style="background:#eff6ff;color:#2563eb;">2순위 확대</span></div>
+      <div class="score-body">
+        <div class="score-item"><div class="s-label">시장규모</div><div class="s-stars" style="color:#f59e0b;">★★★★☆</div></div>
+        <div class="score-item"><div class="s-label">진입장벽</div><div class="s-stars" style="color:#f59e0b;">★★★☆☆</div></div>
+        <div class="score-item"><div class="s-label">수익성</div><div class="s-stars" style="color:#f59e0b;">★★★☆☆</div></div>
+        <div class="score-item"><div class="s-label">안정성</div><div class="s-stars" style="color:#f59e0b;">★★★☆☆</div></div>
+        <div class="score-item"><div class="s-label">시너지</div><div class="s-stars" style="color:#ef4444;">★★★★☆</div></div>
+        <div class="score-item"><div class="s-label">경쟁강도</div><div class="s-stars" style="color:#ef4444;">★★★★☆</div></div>
+      </div>
+      <div class="score-bottom"><span>종합</span><span class="score-total" style="color:var(--primary-mid);">3.5</span></div>
+    </div>
+
+    <div class="score-card" style="border-color:#94a3b8;">
+      <div class="score-top"><span class="score-name">한약 / 학교 / 요트</span><span class="score-badge" style="background:#f1f5f9;color:#64748b;">현상 유지</span></div>
+      <div class="score-body">
+        <div class="score-item"><div class="s-label">시장규모</div><div class="s-stars" style="color:#10b981;">★★☆☆☆</div></div>
+        <div class="score-item"><div class="s-label">진입장벽</div><div class="s-stars" style="color:#10b981;">★★☆☆☆</div></div>
+        <div class="score-item"><div class="s-label">수익성</div><div class="s-stars" style="color:#10b981;">★★☆☆☆</div></div>
+        <div class="score-item"><div class="s-label">안정성</div><div class="s-stars" style="color:#10b981;">★★☆☆☆</div></div>
+        <div class="score-item"><div class="s-label">시너지</div><div class="s-stars" style="color:#10b981;">★★☆☆☆</div></div>
+        <div class="score-item"><div class="s-label">경쟁강도</div><div class="s-stars" style="color:#10b981;">★★☆☆☆</div></div>
+      </div>
+      <div class="score-bottom"><span>종합</span><span class="score-total" style="color:var(--text-sub);">2.0</span></div>
+    </div>
+  </div>
+
+  <!-- 3. 로드맵 -->
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-num">3</span>
+      <h2>확장 전략 로드맵</h2>
+    </div>
+
+    <div class="card">
+      <div class="card-b">
+        <div class="roadmap">
+          <div class="rm-step" style="color:#ef4444;">
+            <div class="rm-phase" style="color:#ef4444;">PHASE 1</div>
+            <h5>기반 강화</h5>
+            <p>기존 핵심 거래처 물량 확대, 계약 단가 체계 정비, 운영 효율화 시스템 구축</p>
+            <span class="rm-time">즉시 ~ 6개월</span>
+          </div>
+          <div class="rm-step" style="color:#f59e0b;">
+            <div class="rm-phase" style="color:#f59e0b;">PHASE 2</div>
+            <h5>영역 확장</h5>
+            <p>동종 업계 신규 고객 발굴, 지역 거점 확대, 전문 운송 역량 강화</p>
+            <span class="rm-time">6개월 ~ 1년</span>
+          </div>
+          <div class="rm-step" style="color:#3b82f6;">
+            <div class="rm-phase" style="color:#3b82f6;">PHASE 3</div>
+            <h5>차별화 성장</h5>
+            <p>특수 운송 전문화, 대기업 거래 확대, 디지털 운영 체계 도입</p>
+            <span class="rm-time">1년 ~ 2년</span>
+          </div>
+          <div class="rm-step" style="color:#10b981;">
+            <div class="rm-phase" style="color:#10b981;">PHASE 4</div>
+            <h5>플랫폼 구축</h5>
+            <p>물류 네트워크 표준화, 파트너십 생태계 확장, 신사업 영역 진출</p>
+            <span class="rm-time">2년 이후</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="str-grid-desk">
+      <div class="str-card" style="border-color:#ef4444;">
+        <div class="str-head">
+          <span class="str-phase" style="background:#fef2f2;color:#dc2626;">PHASE 1</span>
+          <h4 style="color:#dc2626;">전략 1: 핵심 거래처 물량 심화</h4>
+          <div class="str-desc">건설/철가공 거래처의 추가 물량 확보로 매출 기반 공고화</div>
+        </div>
+        <div class="str-body">
+          <ul>
+            <li>철 가공 납품업체 신규 루트 개발 (논산 외)</li>
+            <li>건설사 프로젝트 수주 시 운송 일괄 계약 제안</li>
+            <li>기존 거래처 추가 운송 서비스 번들링</li>
+            <li>운송단가표 계약 체결 대상 확대</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="str-card" style="border-color:#f59e0b;">
+        <div class="str-head">
+          <span class="str-phase" style="background:#fffbeb;color:#d97706;">PHASE 1-2</span>
+          <h4 style="color:#d97706;">전략 2: 가스공사 점유율 확대</h4>
+          <div class="str-desc">견적 경쟁력 및 현장 대응력으로 가스공사 거래 비중 확대</div>
+        </div>
+        <div class="str-body">
+          <ul>
+            <li>가스공사 현장별 대응 체계 구축</li>
+            <li>견적 경쟁력 강화를 위한 원가 구조 분석</li>
+            <li>함안-울산-당진 순환 루트 최적화</li>
+            <li>유사 인프라 현장(석유/전력) 거래처 확장</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="str-card" style="border-color:#3b82f6;">
+        <div class="str-head">
+          <span class="str-phase" style="background:#eff6ff;color:#2563eb;">PHASE 2-3</span>
+          <h4 style="color:#2563eb;">전략 3: 정밀장비 운송 전문화</h4>
+          <div class="str-desc">포스코 거래 기반으로 정밀/특수장비 운송 역량 브랜드화</div>
+        </div>
+        <div class="str-body">
+          <ul>
+            <li>포스코 계열 추가 운송 수요 발굴</li>
+            <li>정밀장비 전용 포장/고정 표준 절차 수립</li>
+            <li>반도체/전자/의료 정밀장비 시장 진출</li>
+            <li>정밀 운송 전문 브랜드 인지도 구축</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="str-card" style="border-color:#10b981;">
+        <div class="str-head">
+          <span class="str-phase" style="background:#ecfdf5;color:#059669;">PHASE 1</span>
+          <h4 style="color:#059669;">전략 4: 운영 효율화 (공차율 감소)</h4>
+          <div class="str-desc">왕복 물량 매칭 및 루트 최적화로 수익성 개선</div>
+        </div>
+        <div class="str-body">
+          <ul>
+            <li>건설 현장 투입-복귀 물량 매칭 체계</li>
+            <li>논산 ↔ 전국 왕복 화물 매칭</li>
+            <li>지역별 운송 허브 운영 (논산/광양/여수)</li>
+            <li>배차 효율 모니터링 KPI 도입</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 리스크 -->
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-num">4</span>
+      <h2>확장 시 리스크 분석</h2>
+    </div>
+
+    <div class="card">
+      <div class="card-h" style="color:var(--accent);">외부 리스크</div>
+      <div class="card-b">
+        <div class="risk-item"><span class="risk-badge risk-high">HIGH</span><div class="risk-info"><h5>건설 경기 하락</h5><p>핵심 매출원(~40%) 건설 물량이 경기에 직접 연동. 부동산/SOC 예산 축소 시 심각한 매출 감소</p></div></div>
+        <div class="risk-item"><span class="risk-badge risk-high">HIGH</span><div class="risk-info"><h5>유가 급등</h5><p>전국 운송 특성상 유가 변동이 수익성에 직격. 건별 견적에서는 즉시 반영 어려움</p></div></div>
+        <div class="risk-item"><span class="risk-badge risk-mid">MID</span><div class="risk-info"><h5>경쟁 심화</h5><p>가스공사 등 견적 입찰 가격 경쟁 심화. 플랫폼 기반 운송 중개 서비스 등장</p></div></div>
+        <div class="risk-item"><span class="risk-badge risk-low">LOW</span><div class="risk-info"><h5>택배/소형물류 대체</h5><p>한약 등 소규모 물량 택배 전환 가능. 전체 매출 영향은 제한적</p></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h" style="color:#f59e0b;">내부 리스크 & 대응 전략</div>
+      <div class="card-b">
+        <div class="risk-item"><span class="risk-badge risk-high">HIGH</span><div class="risk-info"><h5>확장 시 인력/차량 부족</h5><p><strong>대응:</strong> 협력 운송사 네트워크 구축, 차량 임대 옵션 확보, 핵심 루트 자차 우선 운영</p></div></div>
+        <div class="risk-item"><span class="risk-badge risk-mid">MID</span><div class="risk-info"><h5>단가 관리 체계 미비</h5><p><strong>대응:</strong> 지역/거리/차종별 표준 단가 수립, 견적 자동화, 원가 분석 시스템 구축</p></div></div>
+        <div class="risk-item"><span class="risk-badge risk-mid">MID</span><div class="risk-info"><h5>정밀장비 운송 사고</h5><p><strong>대응:</strong> 전문 운송 매뉴얼 수립, 보험 강화, 작업자 교육 프로그램 운영</p></div></div>
+        <div class="risk-item"><span class="risk-badge risk-low">LOW</span><div class="risk-info"><h5>기존 거래처 이탈</h5><p><strong>대응:</strong> 서비스 품질 관리, 정기 만족도 조사, 장기 계약 인센티브 제공</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 실행 과제 -->
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-num">5</span>
+      <h2>우선 실행 과제 Top 8</h2>
+    </div>
+
+    <div class="act-grid-desk">
+      <div class="act-item"><div class="act-num" style="background:#ef4444;">1</div><div class="act-info"><h5>운송 단가 체계 표준화</h5><p>지역/거리/차종별 표준 단가표 작성. 건별 견적 → 단가표 계약 전환</p><span class="act-tag" style="background:#fef2f2;color:#dc2626;">즉시 착수</span></div></div>
+      <div class="act-item"><div class="act-num" style="background:#ef4444;">2</div><div class="act-info"><h5>왕복 화물 매칭 체계 구축</h5><p>건설 현장 복귀+투입 물량 매칭. 논산 거점 왕복 루트 우선 적용</p><span class="act-tag" style="background:#fef2f2;color:#dc2626;">즉시 착수</span></div></div>
+      <div class="act-item"><div class="act-num" style="background:#f59e0b;">3</div><div class="act-info"><h5>철 가공 동종업체 신규 영업</h5><p>논산 인근 및 주요 공단 내 철가공/금속 제조업체 신규 거래처 발굴</p><span class="act-tag" style="background:#fffbeb;color:#d97706;">3개월 내</span></div></div>
+      <div class="act-item"><div class="act-num" style="background:#f59e0b;">4</div><div class="act-info"><h5>가스공사 현장 대응 체계 강화</h5><p>운송 이력 DB화, 견적 경쟁력 분석, 지역별 파트너 운송사 확보</p><span class="act-tag" style="background:#fffbeb;color:#d97706;">3개월 내</span></div></div>
+      <div class="act-item"><div class="act-num" style="background:#3b82f6;">5</div><div class="act-info"><h5>포스코 계열 추가 거래 발굴</h5><p>광양제철 환경분석계 실적 레퍼런스로 포스코 그룹사 수요 탐색</p><span class="act-tag" style="background:#eff6ff;color:#2563eb;">6개월 내</span></div></div>
+      <div class="act-item"><div class="act-num" style="background:#3b82f6;">6</div><div class="act-info"><h5>정밀장비 운송 매뉴얼 수립</h5><p>전용 포장/고정/운송 표준 작업 절차 문서화 및 교육 체계 마련</p><span class="act-tag" style="background:#eff6ff;color:#2563eb;">6개월 내</span></div></div>
+      <div class="act-item"><div class="act-num" style="background:#10b981;">7</div><div class="act-info"><h5>배차/수익성 관리 시스템 도입</h5><p>배차 현황, 공차율, 차종별/거래처별 수익성 모니터링 시스템 구축</p><span class="act-tag" style="background:#ecfdf5;color:#059669;">1년 내</span></div></div>
+      <div class="act-item"><div class="act-num" style="background:#10b981;">8</div><div class="act-info"><h5>협력 운송사 네트워크 구축</h5><p>전국 주요 지역별 협력 운송사 풀 확보, 유연한 차량 확보 체계</p><span class="act-tag" style="background:#ecfdf5;color:#059669;">1년 내</span></div></div>
+    </div>
+  </div>
+
+  <!-- 6. KPI -->
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-num">6</span>
+      <h2>확장 KPI 목표</h2>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card" style="border-color:#ef4444;">
+        <div class="kpi-label">연간 배차 건수</div>
+        <div class="kpi-current" style="color:var(--primary);">2,000건</div>
+        <div class="kpi-arrow" style="color:#ef4444;">↓</div>
+        <div class="kpi-target-val" style="color:#ef4444;">3,000건</div>
+        <div class="kpi-period">2년 내 목표</div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:67%;background:linear-gradient(90deg,#ef4444,#fca5a5);"></div></div>
+      </div>
+      <div class="kpi-card" style="border-color:#3b82f6;">
+        <div class="kpi-label">계약 단가 거래 비중</div>
+        <div class="kpi-current" style="color:var(--primary);">~30%</div>
+        <div class="kpi-arrow" style="color:#3b82f6;">↓</div>
+        <div class="kpi-target-val" style="color:#3b82f6;">50%</div>
+        <div class="kpi-period">1년 내 목표</div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:60%;background:linear-gradient(90deg,#3b82f6,#93c5fd);"></div></div>
+      </div>
+      <div class="kpi-card" style="border-color:#10b981;">
+        <div class="kpi-label">상위2 거래처 집중도</div>
+        <div class="kpi-current" style="color:var(--primary);">~70%</div>
+        <div class="kpi-arrow" style="color:#10b981;">↓</div>
+        <div class="kpi-target-val" style="color:#10b981;">55%</div>
+        <div class="kpi-period">2년 내 목표</div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:79%;background:linear-gradient(90deg,#10b981,#6ee7b7);"></div></div>
+      </div>
+      <div class="kpi-card" style="border-color:#8b5cf6;">
+        <div class="kpi-label">공차율</div>
+        <div class="kpi-current" style="color:var(--primary);">~35%</div>
+        <div class="kpi-arrow" style="color:#8b5cf6;">↓</div>
+        <div class="kpi-target-val" style="color:#8b5cf6;">20%</div>
+        <div class="kpi-period">1년 내 목표</div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:57%;background:linear-gradient(90deg,#8b5cf6,#c4b5fd);"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. 신규 진출 -->
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-num">7</span>
+      <h2>신규 진출 검토 영역</h2>
+    </div>
+
+    <div class="area-grid-desk">
+      <div class="area-card" style="border-color:#ef4444;">
+        <div class="area-head">A. 제조업 SCM 운송</div>
+        <div class="area-desc">기존 철 가공 납품 역량 기반, 제조업 공급망 운송 서비스 확대</div>
+        <div class="area-specs">
+          <div class="area-spec-row"><span>관련 역량</span><strong style="color:#10b981;">높음</strong></div>
+          <div class="area-spec-row"><span>시장 규모</span><strong style="color:#10b981;">대형</strong></div>
+          <div class="area-spec-row"><span>진입 난이도</span><strong style="color:#f59e0b;">중간</strong></div>
+          <div class="area-spec-row"><span>추천 시기</span><strong style="color:#3b82f6;">Phase 2</strong></div>
+        </div>
+      </div>
+      <div class="area-card" style="border-color:#3b82f6;">
+        <div class="area-head">B. 신재생에너지 운송</div>
+        <div class="area-desc">태양광/풍력 설비 운송 등 인프라 건설 물량 확대 트렌드 활용</div>
+        <div class="area-specs">
+          <div class="area-spec-row"><span>관련 역량</span><strong style="color:#f59e0b;">중간</strong></div>
+          <div class="area-spec-row"><span>시장 규모</span><strong style="color:#10b981;">확대 중</strong></div>
+          <div class="area-spec-row"><span>진입 난이도</span><strong style="color:#f59e0b;">중간</strong></div>
+          <div class="area-spec-row"><span>추천 시기</span><strong style="color:#3b82f6;">Phase 2-3</strong></div>
+        </div>
+      </div>
+      <div class="area-card" style="border-color:#10b981;">
+        <div class="area-head">C. 대기업 정밀 물류</div>
+        <div class="area-desc">포스코 실적 기반, 반도체/화학/전자 정밀 운송 수요 기업 확장</div>
+        <div class="area-specs">
+          <div class="area-spec-row"><span>관련 역량</span><strong style="color:#f59e0b;">성장 중</strong></div>
+          <div class="area-spec-row"><span>시장 규모</span><strong style="color:#10b981;">대형</strong></div>
+          <div class="area-spec-row"><span>진입 난이도</span><strong style="color:#ef4444;">높음</strong></div>
+          <div class="area-spec-row"><span>추천 시기</span><strong style="color:#3b82f6;">Phase 3</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. 전략 요약 -->
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-num">8</span>
+      <h2>전략 방향 요약</h2>
+    </div>
+
+    <div class="final-grid">
+      <div class="final-card" style="background:#fef2f2;">
+        <div class="fc-label" style="color:#dc2626;">단기 핵심 과제</div>
+        <div class="fc-title" style="color:#991b1b;">안정화</div>
+        <div class="fc-list" style="color:#64748b;">
+          ▸ 계약 단가 체계 정비<br>
+          ▸ 왕복 물량 매칭 시스템<br>
+          ▸ 공차율 감소 (35%→20%)<br>
+          ▸ 철가공 추가 물량 확보
+        </div>
+      </div>
+      <div class="final-card" style="background:#eff6ff;">
+        <div class="fc-label" style="color:#2563eb;">중기 성장 전략</div>
+        <div class="fc-title" style="color:#1e3a5f;">확장</div>
+        <div class="fc-list" style="color:#64748b;">
+          ▸ 가스공사 점유율 20%+ 달성<br>
+          ▸ 제조업 SCM 운송 진출<br>
+          ▸ 포스코 계열 거래 확대<br>
+          ▸ 지역 거점 강화
+        </div>
+      </div>
+      <div class="final-card" style="background:#ecfdf5;">
+        <div class="fc-label" style="color:#059669;">장기 비전</div>
+        <div class="fc-title" style="color:#064e3b;">차별화</div>
+        <div class="fc-list" style="color:#64748b;">
+          ▸ 정밀장비 운송 전문 브랜드화<br>
+          ▸ 연 3,000건+ 배차 달성<br>
+          ▸ 디지털 운영 체계 구축<br>
+          ▸ 협력 네트워크 생태계 확보
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">확장 전략 검토용 구조 분석본 &copy; 2026 | CONFIDENTIAL - 내부 전략 검토 전용</div>
+
+</body>
+</html>

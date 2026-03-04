@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>사업 포트폴리오 분석 정리본</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+  :root {
+    --primary: #0f172a;
+    --primary-mid: #1e3a5f;
+    --primary-light: #3b82f6;
+    --accent: #ef4444;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #0f172a;
+    --text-sub: #64748b;
+    --border: #e2e8f0;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --purple: #8b5cf6;
+    --teal: #14b8a6;
+    --radius: 16px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04);
+  }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #2563eb 100%);
+    color: white;
+    padding: 40px 20px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  .header .date-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    position: relative;
+  }
+  .header .subtitle {
+    font-size: 13px;
+    opacity: 0.65;
+    font-weight: 400;
+    position: relative;
+  }
+
+  /* ===== CONTAINER ===== */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 16px 48px;
+  }
+
+  /* ===== SECTION TITLE ===== */
+  .section-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--primary);
+    margin: 32px 0 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .num {
+    background: var(--primary);
+    color: white;
+    min-width: 28px; height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  /* ===== KPI OVERVIEW ===== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .kpi-item {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    border-top: 3px solid var(--primary-light);
+  }
+  .kpi-item .val {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--primary-mid);
+    line-height: 1.2;
+  }
+  .kpi-item .lbl {
+    font-size: 11px;
+    color: var(--text-sub);
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 14px 18px;
+    font-weight: 700;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--primary-mid);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-body { padding: 18px; }
+
+  /* ===== PORTFOLIO - MOBILE CARDS ===== */
+  .port-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+    overflow: hidden;
+    border-left: 4px solid;
+  }
+  .port-header {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .port-header .port-name {
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .port-header .port-no {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-sub);
+    background: var(--bg);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .port-body { padding: 14px 16px; }
+  .port-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 6px 0;
+    font-size: 13px;
+  }
+  .port-row .port-key {
+    color: var(--text-sub);
+    font-weight: 500;
+    flex-shrink: 0;
+    width: 70px;
+  }
+  .port-row .port-val {
+    text-align: right;
+    flex: 1;
+    margin-left: 12px;
+  }
+  .port-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+
+  /* ===== TAGS ===== */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .tag-blue { background: #eff6ff; color: #2563eb; }
+  .tag-green { background: #ecfdf5; color: #059669; }
+  .tag-orange { background: #fffbeb; color: #d97706; }
+  .tag-red { background: #fef2f2; color: #dc2626; }
+  .tag-purple { background: #f5f3ff; color: #7c3aed; }
+  .tag-teal { background: #f0fdfa; color: #0d9488; }
+
+  /* ===== BADGES ===== */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .badge-high { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+  .badge-mid { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+  .badge-low { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+
+  /* ===== BAR CHART ===== */
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-lbl {
+    width: 80px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: right;
+    flex-shrink: 0;
+    color: var(--text-sub);
+  }
+  .bar-track {
+    flex: 1;
+    height: 26px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 11px;
+    font-weight: 800;
+    color: white;
+    min-width: 36px;
+  }
+
+  /* ===== LIST ITEMS ===== */
+  .stat-list { list-style: none; }
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+  }
+  .stat-item:last-child { border-bottom: none; }
+  .stat-dot {
+    width: 12px; height: 12px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .stat-pct {
+    margin-left: auto;
+    font-weight: 800;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  /* ===== FLOW DIAGRAMS ===== */
+  .flow-section { margin-bottom: 16px; }
+  .flow-label {
+    font-size: 11px;
+    color: var(--text-sub);
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .flow-steps {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .flow-node {
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    flex-shrink: 0;
+  }
+  .flow-node small { display: block; font-size: 10px; font-weight: 400; opacity: 0.85; margin-top: 2px; }
+  .flow-arrow { font-size: 16px; color: #94a3b8; flex-shrink: 0; }
+
+  /* ===== SWOT ===== */
+  .swot-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .swot-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid;
+  }
+  .swot-card h4 {
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .swot-card ul { list-style: none; font-size: 12px; }
+  .swot-card ul li {
+    padding: 4px 0 4px 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .swot-card ul li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 10px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.3;
+  }
+
+  /* ===== VEHICLE TABLE (horizontal scroll) ===== */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -16px;
+    padding: 0 16px;
+  }
+  .table-wrap table {
+    width: 100%;
+    min-width: 500px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+  }
+  .table-wrap th {
+    background: var(--primary);
+    color: white;
+    padding: 10px 12px;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+  }
+  .table-wrap th:first-child { border-radius: 10px 0 0 0; }
+  .table-wrap th:last-child { border-radius: 0 10px 0 0; }
+  .table-wrap td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .table-wrap tr:last-child td { border-bottom: none; }
+
+  /* ===== SUMMARY GRID ===== */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .summary-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px 18px;
+    box-shadow: var(--shadow);
+    border-top: 3px solid;
+  }
+  .summary-card h4 {
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .summary-card ul { list-style: none; font-size: 12px; }
+  .summary-card ul li {
+    padding: 5px 0 5px 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .summary-card ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--primary-light);
+    font-weight: 700;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 24px 16px;
+    color: var(--text-sub);
+    font-size: 11px;
+  }
+
+  /* ===== DESKTOP ===== */
+  @media (min-width: 640px) {
+    .header { padding: 48px 32px 40px; }
+    .header h1 { font-size: 28px; }
+    .container { padding: 28px 24px 60px; }
+    .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+    .kpi-item .val { font-size: 26px; }
+    .section-title { font-size: 20px; margin-top: 40px; }
+    .swot-grid { grid-template-columns: 1fr 1fr; }
+    .summary-grid { grid-template-columns: repeat(3, 1fr); }
+    .bar-lbl { width: 100px; font-size: 12px; }
+    .flow-node { padding: 12px 18px; font-size: 13px; }
+  }
+
+  @media (min-width: 960px) {
+    .header h1 { font-size: 32px; }
+    .port-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .port-card { margin-bottom: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="date-badge">2026. 03. 04 기준</div>
+  <h1>사업 포트폴리오 분석 정리본</h1>
+  <p class="subtitle">운송사업 구조 분석 및 거래처별 포트폴리오 현황</p>
+</div>
+
+<div class="container">
+
+  <!-- 1. 핵심 지표 -->
+  <div class="section-title"><span class="num">1</span> 회사 개요 핵심 지표</div>
+  <div class="kpi-grid">
+    <div class="kpi-item"><div class="val">소기업</div><div class="lbl">기업 규모</div></div>
+    <div class="kpi-item"><div class="val">2,000+</div><div class="lbl">연간 배차 건수</div></div>
+    <div class="kpi-item"><div class="val">7개</div><div class="lbl">거래처 유형</div></div>
+    <div class="kpi-item"><div class="val">1t~추레라</div><div class="lbl">운용 차종 범위</div></div>
+  </div>
+
+  <!-- 2. 포트폴리오 매트릭스 -->
+  <div class="section-title"><span class="num">2</span> 거래처별 포트폴리오 매트릭스</div>
+
+  <div class="port-grid">
+
+    <div class="port-card" style="border-color:#3b82f6;">
+      <div class="port-header">
+        <span class="port-name">건설회사 / 지반공사</span>
+        <span class="port-no">01</span>
+      </div>
+      <div class="port-body">
+        <div class="port-row">
+          <span class="port-key">품목</span>
+          <span class="port-val">
+            <div class="port-tags">
+              <span class="tag tag-blue">건설장비</span><span class="tag tag-blue">H빔</span><span class="tag tag-blue">파이프</span><span class="tag tag-blue">철판</span><span class="tag tag-blue">가설자재</span><span class="tag tag-blue">발전기</span><span class="tag tag-blue">컨테이너</span>
+            </div>
+          </span>
+        </div>
+        <div class="port-row"><span class="port-key">차종</span><span class="port-val">5t~25t 카고, 추레라</span></div>
+        <div class="port-row"><span class="port-key">단가</span><span class="port-val">건별 견적 <span style="color:var(--red);font-size:11px;">(현장별 변동)</span></span></div>
+        <div class="port-row"><span class="port-key">안정성</span><span class="port-val"><span class="badge badge-mid">프로젝트 종속</span></span></div>
+        <div class="port-row"><span class="port-key">중요도</span><span class="port-val"><span class="badge badge-high">핵심</span></span></div>
+      </div>
+    </div>
+
+    <div class="port-card" style="border-color:#10b981;">
+      <div class="port-header">
+        <span class="port-name">철 가공제품 납품업체</span>
+        <span class="port-no">02</span>
+      </div>
+      <div class="port-body">
+        <div class="port-row">
+          <span class="port-key">품목</span>
+          <span class="port-val">
+            <div class="port-tags">
+              <span class="tag tag-green">금형</span><span class="tag tag-green">파이프</span><span class="tag tag-green">철판</span><span class="tag tag-green">완제품 파렛트</span>
+            </div>
+          </span>
+        </div>
+        <div class="port-row"><span class="port-key">차종</span><span class="port-val">1t~25t 카고/윙</span></div>
+        <div class="port-row"><span class="port-key">단가</span><span class="port-val">계약 단가표 <span style="color:var(--green);font-size:11px;">(안정적)</span></span></div>
+        <div class="port-row"><span class="port-key">안정성</span><span class="port-val"><span class="badge badge-high">안정 반복</span></span></div>
+        <div class="port-row"><span class="port-key">중요도</span><span class="port-val"><span class="badge badge-high">핵심</span></span></div>
+      </div>
+    </div>
+
+    <div class="port-card" style="border-color:#f59e0b;">
+      <div class="port-header">
+        <span class="port-name">가스공사 회사</span>
+        <span class="port-no">03</span>
+      </div>
+      <div class="port-body">
+        <div class="port-row">
+          <span class="port-key">품목</span>
+          <span class="port-val">
+            <div class="port-tags">
+              <span class="tag tag-orange">파이프 관</span><span class="tag tag-orange">컨테이너</span><span class="tag tag-orange">장비</span>
+            </div>
+          </span>
+        </div>
+        <div class="port-row"><span class="port-key">차종</span><span class="port-val">추레라, 5t~25t 카고</span></div>
+        <div class="port-row"><span class="port-key">단가</span><span class="port-val">건별 견적 <span style="color:var(--orange);font-size:11px;">(경쟁 입찰)</span></span></div>
+        <div class="port-row"><span class="port-key">안정성</span><span class="port-val"><span class="badge badge-mid">현장 종속</span></span></div>
+        <div class="port-row"><span class="port-key">중요도</span><span class="port-val"><span class="badge badge-mid">성장</span></span></div>
+      </div>
+    </div>
+
+    <div class="port-card" style="border-color:#8b5cf6;">
+      <div class="port-header">
+        <span class="port-name">한약회사</span>
+        <span class="port-no">04</span>
+      </div>
+      <div class="port-body">
+        <div class="port-row">
+          <span class="port-key">품목</span>
+          <span class="port-val"><div class="port-tags"><span class="tag tag-purple">한약 자재 파렛트</span><span class="tag tag-purple">마대</span></div></span>
+        </div>
+        <div class="port-row"><span class="port-key">차종</span><span class="port-val">5t~11t 윙</span></div>
+        <div class="port-row"><span class="port-key">단가</span><span class="port-val">정기 운송</span></div>
+        <div class="port-row"><span class="port-key">안정성</span><span class="port-val"><span class="badge badge-low">소규모 안정</span></span></div>
+        <div class="port-row"><span class="port-key">중요도</span><span class="port-val"><span class="badge badge-low">유지</span></span></div>
+      </div>
+    </div>
+
+    <div class="port-card" style="border-color:#14b8a6;">
+      <div class="port-header">
+        <span class="port-name">학교 / 산업인력공단</span>
+        <span class="port-no">05</span>
+      </div>
+      <div class="port-body">
+        <div class="port-row"><span class="port-key">품목</span><span class="port-val"><span class="tag tag-teal">기능대회 출전 장비</span></span></div>
+        <div class="port-row"><span class="port-key">차종</span><span class="port-val">1t 위주</span></div>
+        <div class="port-row"><span class="port-key">안정성</span><span class="port-val"><span class="badge badge-low">시즌성 (9~10월)</span></span></div>
+        <div class="port-row"><span class="port-key">중요도</span><span class="port-val"><span class="badge badge-low">부가</span></span></div>
+      </div>
+    </div>
+
+    <div class="port-card" style="border-color:#14b8a6;">
+      <div class="port-header">
+        <span class="port-name">요트 운송</span>
+        <span class="port-no">06</span>
+      </div>
+      <div class="port-body">
+        <div class="port-row"><span class="port-key">품목</span><span class="port-val"><span class="tag tag-teal">요트 (경기용)</span></span></div>
+        <div class="port-row"><span class="port-key">차종</span><span class="port-val">5t~25t 카고</span></div>
+        <div class="port-row"><span class="port-key">안정성</span><span class="port-val"><span class="badge badge-low">비정기</span></span></div>
+        <div class="port-row"><span class="port-key">중요도</span><span class="port-val"><span class="badge badge-low">부가</span></span></div>
+      </div>
+    </div>
+
+    <div class="port-card" style="border-color:#ef4444;">
+      <div class="port-header">
+        <span class="port-name">환경분석계 (포스코 광양)</span>
+        <span class="port-no">07</span>
+      </div>
+      <div class="port-body">
+        <div class="port-row"><span class="port-key">품목</span><span class="port-val"><span class="tag tag-red">정밀장비</span></span></div>
+        <div class="port-row"><span class="port-key">차종</span><span class="port-val">1t~5t 윙바디</span></div>
+        <div class="port-row"><span class="port-key">단가</span><span class="port-val">정기/건별 혼합</span></div>
+        <div class="port-row"><span class="port-key">안정성</span><span class="port-val"><span class="badge badge-mid">거래처 의존</span></span></div>
+        <div class="port-row"><span class="port-key">중요도</span><span class="port-val"><span class="badge badge-mid">성장</span></span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 3. 구조 분석 -->
+  <div class="section-title"><span class="num">3</span> 포트폴리오 구조 분석</div>
+
+  <div class="card">
+    <div class="card-head">매출 비중 추정 (거래처 유형별)</div>
+    <div class="card-body">
+      <div class="bar-chart">
+        <div class="bar-row"><span class="bar-lbl">건설/지반</span><div class="bar-track"><div class="bar-fill" style="width:40%; background:linear-gradient(90deg,#2563eb,#60a5fa);">40%</div></div></div>
+        <div class="bar-row"><span class="bar-lbl">철가공납품</span><div class="bar-track"><div class="bar-fill" style="width:30%; background:linear-gradient(90deg,#059669,#34d399);">30%</div></div></div>
+        <div class="bar-row"><span class="bar-lbl">가스공사</span><div class="bar-track"><div class="bar-fill" style="width:15%; background:linear-gradient(90deg,#d97706,#fbbf24);">15%</div></div></div>
+        <div class="bar-row"><span class="bar-lbl">환경분석계</span><div class="bar-track"><div class="bar-fill" style="width:6%; background:linear-gradient(90deg,#dc2626,#f87171);">6%</div></div></div>
+        <div class="bar-row"><span class="bar-lbl">한약회사</span><div class="bar-track"><div class="bar-fill" style="width:4%; background:linear-gradient(90deg,#7c3aed,#a78bfa);">4%</div></div></div>
+        <div class="bar-row"><span class="bar-lbl">기타</span><div class="bar-track"><div class="bar-fill" style="width:5%; background:linear-gradient(90deg,#0d9488,#5eead4);">5%</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">운송 특성별 분류</div>
+    <div class="card-body">
+      <ul class="stat-list">
+        <li class="stat-item"><span class="stat-dot" style="background:#ef4444;"></span><span>프로젝트형 (건설/가스/요트)</span><span class="stat-pct" style="color:#ef4444;">~55%</span></li>
+        <li class="stat-item"><span class="stat-dot" style="background:#10b981;"></span><span>정기 반복형 (철가공/한약/환경)</span><span class="stat-pct" style="color:#10b981;">~40%</span></li>
+        <li class="stat-item"><span class="stat-dot" style="background:#8b5cf6;"></span><span>시즌형 (기능대회)</span><span class="stat-pct" style="color:#8b5cf6;">~5%</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">단가 결정 방식</div>
+    <div class="card-body">
+      <ul class="stat-list">
+        <li class="stat-item"><span class="stat-dot" style="background:#3b82f6;"></span><span>건별 견적 (현장 변동)</span><span class="stat-pct" style="color:#3b82f6;">~60%</span></li>
+        <li class="stat-item"><span class="stat-dot" style="background:#10b981;"></span><span>계약 단가표 기반</span><span class="stat-pct" style="color:#10b981;">~30%</span></li>
+        <li class="stat-item"><span class="stat-dot" style="background:#f59e0b;"></span><span>혼합형</span><span class="stat-pct" style="color:#f59e0b;">~10%</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 4. 운송 흐름 -->
+  <div class="section-title"><span class="num">4</span> 주요 운송 흐름 구조</div>
+
+  <div class="card">
+    <div class="card-head">건설/지반공사 운송 흐름</div>
+    <div class="card-body">
+      <div class="flow-section">
+        <div class="flow-label">투입 운송</div>
+        <div class="flow-steps">
+          <span class="flow-node" style="background:#eff6ff; color:#2563eb; border:2px solid #bfdbfe;">자재업체</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node" style="background:#2563eb; color:white;">현장 A</span>
+        </div>
+      </div>
+      <div class="flow-section">
+        <div class="flow-label">현장 간 이동</div>
+        <div class="flow-steps">
+          <span class="flow-node" style="background:#2563eb; color:white;">현장 A</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node" style="background:#2563eb; color:white;">현장 B</span>
+        </div>
+      </div>
+      <div class="flow-section">
+        <div class="flow-label">복귀 운송</div>
+        <div class="flow-steps">
+          <span class="flow-node" style="background:#2563eb; color:white;">현장 B</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node" style="background:#eff6ff; color:#2563eb; border:2px solid #bfdbfe;">자재/대여업체</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">철 가공 납품업체 운송 흐름</div>
+    <div class="card-body">
+      <div class="flow-section">
+        <div class="flow-label">원자재 순환</div>
+        <div class="flow-steps">
+          <span class="flow-node" style="background:#059669; color:white;">논산 공장</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node" style="background:#ecfdf5; color:#059669; border:2px solid #a7f3d0;">가공업체<small>시흥/안산/부산/군산/김제/광주</small></span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node" style="background:#059669; color:white;">논산 공장</span>
+        </div>
+      </div>
+      <div class="flow-section">
+        <div class="flow-label">완제품 출하</div>
+        <div class="flow-steps">
+          <span class="flow-node" style="background:#059669; color:white;">논산 공장</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node" style="background:#ecfdf5; color:#059669; border:2px solid #a7f3d0;">납품처<small>부산/울산/당진/서산대산/여수</small></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">가스공사 운송 흐름</div>
+    <div class="card-body">
+      <div class="flow-section">
+        <div class="flow-label">순환 운송 구조</div>
+        <div class="flow-steps">
+          <span class="flow-node" style="background:#d97706; color:white;">함안</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node" style="background:#d97706; color:white;">울산</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node" style="background:#d97706; color:white;">당진</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node" style="background:#fffbeb; color:#d97706; border:2px solid #fde68a;">기타 현장</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 차종 매핑 -->
+  <div class="section-title"><span class="num">5</span> 차종 운용 매핑</div>
+
+  <div class="card">
+    <div class="card-body" style="padding:12px;">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>차종</th><th>차체</th><th>주요 투입 거래처</th><th>주요 품목</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>1톤</strong></td><td>카고</td><td>학교/산업인력공단, 환경분석계</td><td>소형 장비, 기능대회 장비</td></tr>
+            <tr><td><strong>2.5톤</strong></td><td>윙바디</td><td>환경분석계 (포스코 광양)</td><td>정밀장비</td></tr>
+            <tr><td><strong>5톤</strong></td><td>카고/윙</td><td>건설, 가스, 한약, 요트, 환경</td><td>파이프, 한약자재, 요트, 정밀장비</td></tr>
+            <tr><td><strong>11톤</strong></td><td>카고/윙</td><td>가스, 한약, 철가공, 요트</td><td>파이프관, 한약자재, 금형, 요트</td></tr>
+            <tr><td><strong>25톤</strong></td><td>카고/윙</td><td>건설, 가스, 철가공, 요트</td><td>건설장비, H빔, 철판, 완제품</td></tr>
+            <tr><td><strong>추레라</strong></td><td>트레일러</td><td>건설, 가스공사</td><td>대형장비, 컨테이너, 대형파이프</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. SWOT -->
+  <div class="section-title"><span class="num">6</span> 포트폴리오 SWOT 분석</div>
+
+  <div class="swot-grid">
+    <div class="swot-card" style="border-color:#3b82f6;">
+      <h4 style="color:#2563eb;">S 강점</h4>
+      <ul>
+        <li>전국 단위 운송 커버리지 확보</li>
+        <li>1t~추레라까지 폭넓은 차종 운용</li>
+        <li>건설/제조/공공 등 다각화된 포트폴리오</li>
+        <li>왕복 물량 구조로 운용 효율 극대화 가능</li>
+        <li>연 2,000건+ 안정적 배차 실적</li>
+      </ul>
+    </div>
+    <div class="swot-card" style="border-color:#ef4444;">
+      <h4 style="color:#dc2626;">W 약점</h4>
+      <ul>
+        <li>프로젝트형 물량 비중 높아 매출 변동성</li>
+        <li>건별 견적 비중 높아 수익성 예측 어려움</li>
+        <li>건설/철가공 매출 집중도 ~70%</li>
+        <li>소기업 규모로 대형 물량 동시 대응 한계</li>
+        <li>소규모 거래처 수익성 검증 필요</li>
+      </ul>
+    </div>
+    <div class="swot-card" style="border-color:#10b981;">
+      <h4 style="color:#059669;">O 기회</h4>
+      <ul>
+        <li>정밀장비 운송 전문성 확대 (대기업 거래)</li>
+        <li>계약 단가 기반 거래처 확대로 수익 안정화</li>
+        <li>건설/가스 현장 다변화로 점유율 확대</li>
+        <li>특수 운송(요트/정밀) 차별화 역량 구축</li>
+        <li>왕복 물량 최적화로 공차율 감소</li>
+      </ul>
+    </div>
+    <div class="swot-card" style="border-color:#f59e0b;">
+      <h4 style="color:#d97706;">T 위협</h4>
+      <ul>
+        <li>건설 경기 하락 시 핵심 매출원 직격타</li>
+        <li>가스공사 등 견적 경쟁 심화</li>
+        <li>택배/소형 물류 대체 위협</li>
+        <li>유가 변동에 따른 운송 원가 불확실성</li>
+        <li>프로젝트 종료 후 물량 공백 리스크</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 7. 시사점 -->
+  <div class="section-title"><span class="num">7</span> 핵심 시사점 및 전략 방향</div>
+
+  <div class="summary-grid">
+    <div class="summary-card" style="border-color:#ef4444;">
+      <h4><span style="color:#ef4444; font-size:18px;">●</span> 수익 안정화</h4>
+      <ul>
+        <li>계약 단가표 기반 거래처 비중 확대</li>
+        <li>철 가공 납품 물량 추가 확보</li>
+        <li>정기 반복형 물량 비중 40%→50% 목표</li>
+        <li>환경분석계 등 전문 운송 강화</li>
+      </ul>
+    </div>
+    <div class="summary-card" style="border-color:#3b82f6;">
+      <h4><span style="color:#3b82f6; font-size:18px;">●</span> 운영 효율화</h4>
+      <ul>
+        <li>왕복 물량 매칭 시스템 구축</li>
+        <li>건설 현장 투입-복귀 루트 최적화</li>
+        <li>공차 운행 비율 모니터링 체계 마련</li>
+        <li>차종별 수익성 분석 및 투입 최적화</li>
+      </ul>
+    </div>
+    <div class="summary-card" style="border-color:#10b981;">
+      <h4><span style="color:#10b981; font-size:18px;">●</span> 성장 동력</h4>
+      <ul>
+        <li>포스코 등 대기업 정밀장비 운송 확대</li>
+        <li>가스공사 현장 점유율 확대</li>
+        <li>특수 운송(요트/정밀) 브랜딩 차별화</li>
+        <li>지역 거점 강화 (논산/광양/여수 축)</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">사업 포트폴리오 분석 정리본 &copy; 2026 | 내부 검토용 자료</div>
+
+</body>
+</html>
